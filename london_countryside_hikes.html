@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countryside hikes from Hackney — Saturday 23 May 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #FAF9F5;
+    color: #1A1A19;
+    line-height: 1.6;
+    padding: 32px 20px 60px;
+    min-height: 100vh;
+  }
+  .container { max-width: 920px; margin: 0 auto; }
+
+  /* Header */
+  header { margin-bottom: 28px; }
+  h1 { font-size: 28px; font-weight: 500; margin-bottom: 6px; letter-spacing: -0.5px; }
+  .subtitle { font-size: 14px; color: #6B6A66; }
+
+  /* Weather banner */
+  .weather-banner {
+    background: #FFFFFF;
+    border: 0.5px solid #DDDBD3;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+  }
+  .weather-banner-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6B6A66;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .weather-summary {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .weather-icon {
+    width: 36px; height: 36px;
+    background: #FAEEDA;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .weather-text { flex: 1; }
+  .weather-temp { font-size: 18px; font-weight: 500; }
+  .weather-desc { font-size: 13px; color: #6B6A66; }
+  .weather-sources {
+    font-size: 12px;
+    color: #6B6A66;
+    padding-top: 12px;
+    border-top: 0.5px solid #EAE8E0;
+    line-height: 1.7;
+  }
+  .weather-sources strong { font-weight: 500; color: #1A1A19; }
+  .weather-sources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px 16px;
+    margin-top: 4px;
+  }
+
+  /* Section headings */
+  h2 {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 32px 0 12px;
+  }
+  .section-hint {
+    font-size: 13px;
+    color: #6B6A66;
+    margin-bottom: 16px;
+  }
+
+  /* Map */
+  .map-card {
+    background: #FFFFFF;
+    border: 0.5px solid #DDDBD3;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 28px;
+  }
+  .map-svg { width: 100%; height: auto; display: block; }
+  .map-legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 0.5px solid #EAE8E0;
+    font-size: 12px;
+    color: #6B6A66;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* Hike cards */
+  .hikes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .hike-card {
+    background: #FFFFFF;
+    border: 0.5px solid #DDDBD3;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    padding: 0;
+    color: inherit;
+  }
+  .hike-card:hover {
+    transform: translateY(-2px);
+    border-color: #BCB9AC;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  .hike-card.featured { border: 2px solid #378ADD; }
+  .hike-image {
+    width: 100%; height: 140px;
+    background-size: cover;
+    background-position: center;
+    background-color: #EAE8E0;
+  }
+  .hike-content { padding: 14px 16px 16px; }
+  .hike-number {
+    font-size: 10px;
+    font-weight: 500;
+    color: #6B6A66;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .hike-title {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    line-height: 1.35;
+  }
+  .hike-meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: #6B6A66;
+    margin-bottom: 10px;
+  }
+  .hike-meta-item { display: flex; align-items: center; gap: 4px; }
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 8px;
+  }
+  .pill-challenging { background: #FAEEDA; color: #633806; }
+  .pill-moderate { background: #EAF3DE; color: #27500A; }
+  .pill-easy { background: #E1F5EE; color: #04342C; }
+  .pill-featured { background: #E6F1FB; color: #0C447C; margin-left: 6px; }
+  .tap-hint {
+    font-size: 11px;
+    color: #888780;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 20, 18, 0.55);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    z-index: 100;
+    overflow-y: auto;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: #FAF9F5;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 720px;
+    overflow: hidden;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+  }
+  .modal-image {
+    width: 100%;
+    height: 220px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  .modal-close {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.95);
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    color: #1A1A19;
+  }
+  .modal-close:hover { background: #FFFFFF; }
+  .modal-body { padding: 20px 24px 24px; }
+  .modal-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    color: #6B6A66;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .modal-title {
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+  .modal-summary {
+    font-size: 14px;
+    color: #444441;
+    margin-bottom: 18px;
+    line-height: 1.65;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: #FFFFFF;
+    border: 0.5px solid #DDDBD3;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: #6B6A66;
+    margin-bottom: 2px;
+  }
+  .stat-value {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .modal-section { margin-bottom: 18px; }
+  .modal-section h3 {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6B6A66;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .modal-section p, .modal-section li {
+    font-size: 14px;
+    line-height: 1.65;
+    color: #1A1A19;
+  }
+  .modal-section ul { padding-left: 20px; }
+  .modal-section li { margin-bottom: 4px; }
+
+  .journey-box {
+    background: #FFFFFF;
+    border: 0.5px solid #DDDBD3;
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .journey-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    padding: 6px 0;
+  }
+  .journey-row + .journey-row { border-top: 0.5px solid #EAE8E0; }
+  .journey-station {
+    font-weight: 500;
+    min-width: 100px;
+    font-size: 13px;
+  }
+  .journey-arrow { color: #888780; }
+  .journey-detail { flex: 1; color: #444441; }
+  .journey-time { font-size: 12px; color: #6B6A66; }
+
+  .weather-detail {
+    background: #FFFFFF;
+    border: 0.5px solid #DDDBD3;
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .weather-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    padding: 4px 0;
+  }
+  .weather-detail-label { color: #6B6A66; }
+  .weather-detail-value { font-weight: 500; }
+
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 0.5px solid #DDDBD3;
+    font-size: 12px;
+    color: #888780;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <h1>Countryside hikes from Hackney</h1>
+    <p class="subtitle">Five options · within 90 min train · for Saturday 23 May 2026</p>
+  </header>
+
+  <!-- WEATHER -->
+  <div class="weather-banner">
+    <div class="weather-banner-title">Saturday 23 May · weather outlook</div>
+    <div class="weather-summary">
+      <div class="weather-icon">☀️</div>
+      <div class="weather-text">
+        <div class="weather-temp">Warm — 22 to 28°C across the region</div>
+        <div class="weather-desc">Light shower risk (35–45%) in places. Pack a light waterproof but a good day overall.</div>
+      </div>
+    </div>
+    <div class="weather-sources">
+      <div><strong>Cross-checked across three sources:</strong></div>
+      <div class="weather-sources-grid">
+        <div>• <strong>Met Office:</strong> 23–27°C, mixed sun</div>
+        <div>• <strong>TheWeatherOutlook (ECMWF):</strong> peak 27°C</div>
+        <div>• <strong>AccuWeather:</strong> warm spell, light rain risk</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <h2>Where they sit relative to Hackney</h2>
+  <p class="section-hint">Click any hike on the map or below to see details.</p>
+
+  <div class="map-card">
+    <svg class="map-svg" viewBox="0 0 880 460" xmlns="http://www.w3.org/2000/svg" role="img">
+      <title>Map of hike locations around London with train terminals</title>
+
+      <!-- compass -->
+      <g transform="translate(820, 50)">
+        <text x="0" y="-18" text-anchor="middle" font-size="11" fill="#6B6A66">N</text>
+        <line x1="0" y1="-12" x2="0" y2="12" stroke="#888780" stroke-width="1"/>
+        <polygon points="0,-12 -4,-6 4,-6" fill="#6B6A66"/>
+      </g>
+
+      <!-- coastline -->
+      <path d="M 0 425 Q 250 410 440 430 Q 620 415 880 435 L 880 460 L 0 460 Z" fill="#E6F1FB" opacity="0.7"/>
+      <text x="130" y="450" font-size="11" fill="#185FA5" font-style="italic">English Channel</text>
+
+      <!-- ridges (subtle terrain hints) -->
+      <path d="M 230 360 Q 350 350 480 365 Q 600 370 720 360" stroke="#C0DD97" stroke-width="3" fill="none" opacity="0.55"/>
+      <text x="475" y="385" font-size="10" fill="#3B6D11" font-style="italic" text-anchor="middle">South Downs</text>
+      <path d="M 130 165 Q 220 145 310 165" stroke="#C0DD97" stroke-width="3" fill="none" opacity="0.55"/>
+      <text x="220" y="138" font-size="10" fill="#3B6D11" font-style="italic" text-anchor="middle">Chilterns</text>
+
+      <!-- HACKNEY (London terminals area) -->
+      <circle cx="450" cy="240" r="38" fill="#FAF9F5" stroke="#534AB7" stroke-width="1" stroke-dasharray="3 3"/>
+      <circle cx="450" cy="240" r="6" fill="#534AB7"/>
+      <text x="450" y="232" text-anchor="middle" font-size="11" font-weight="500" fill="#26215C">Hackney</text>
+      <text x="450" y="258" text-anchor="middle" font-size="9" fill="#5F5E5A">central London</text>
+
+      <!-- Connection lines from London to each hike start station -->
+      <!-- to Tring -->
+      <line x1="450" y1="240" x2="225" y2="155" stroke="#1D9E75" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/>
+      <text x="320" y="195" font-size="9" fill="#0F6E56" transform="rotate(-22, 320, 195)">via Euston</text>
+
+      <!-- to Manningtree -->
+      <line x1="450" y1="240" x2="695" y2="140" stroke="#1D9E75" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/>
+      <text x="565" y="180" font-size="9" fill="#0F6E56" transform="rotate(-22, 565, 180)">via Liverpool St</text>
+
+      <!-- to Box Hill -->
+      <line x1="450" y1="240" x2="375" y2="355" stroke="#D85A30" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/>
+      <text x="392" y="305" font-size="9" fill="#993C1D" transform="rotate(57, 392, 305)">via Waterloo</text>
+
+      <!-- to Hassocks -->
+      <line x1="450" y1="240" x2="540" y2="380" stroke="#D85A30" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/>
+      <text x="510" y="310" font-size="9" fill="#993C1D" transform="rotate(57, 510, 310)">via Victoria</text>
+
+      <!-- to Seaford -->
+      <line x1="450" y1="240" x2="455" y2="405" stroke="#D85A30" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/>
+      <text x="460" y="330" font-size="9" fill="#993C1D">via Victoria</text>
+
+      <!-- Tring -->
+      <g class="map-pin" data-hike="tring" style="cursor: pointer;">
+        <circle cx="225" cy="155" r="9" fill="#1D9E75"/>
+        <text x="225" y="159" text-anchor="middle" font-size="10" font-weight="500" fill="#FFFFFF">4</text>
+        <text x="225" y="138" text-anchor="middle" font-size="11" font-weight="500" fill="#04342C">Tring</text>
+        <text x="225" y="125" text-anchor="middle" font-size="9" fill="#0F6E56">⟶ Wendover</text>
+      </g>
+
+      <!-- Manningtree -->
+      <g class="map-pin" data-hike="dedham" style="cursor: pointer;">
+        <circle cx="695" cy="140" r="9" fill="#1D9E75"/>
+        <text x="695" y="144" text-anchor="middle" font-size="10" font-weight="500" fill="#FFFFFF">5</text>
+        <text x="695" y="123" text-anchor="middle" font-size="11" font-weight="500" fill="#04342C">Manningtree</text>
+        <text x="695" y="110" text-anchor="middle" font-size="9" fill="#0F6E56">⟲ loop</text>
+      </g>
+
+      <!-- Box Hill -->
+      <g class="map-pin" data-hike="boxhill" style="cursor: pointer;">
+        <circle cx="375" cy="355" r="9" fill="#D85A30"/>
+        <text x="375" y="359" text-anchor="middle" font-size="10" font-weight="500" fill="#FFFFFF">2</text>
+        <text x="318" y="357" text-anchor="end" font-size="11" font-weight="500" fill="#4A1B0C">Box Hill</text>
+        <text x="318" y="370" text-anchor="end" font-size="9" fill="#993C1D">⟲ loop</text>
+      </g>
+
+      <!-- Hassocks → Lewes -->
+      <g class="map-pin" data-hike="hassocks" style="cursor: pointer;">
+        <circle cx="540" cy="380" r="9" fill="#D85A30"/>
+        <text x="540" y="384" text-anchor="middle" font-size="10" font-weight="500" fill="#FFFFFF">3</text>
+        <text x="595" y="378" text-anchor="start" font-size="11" font-weight="500" fill="#4A1B0C">Hassocks</text>
+        <text x="595" y="391" text-anchor="start" font-size="9" fill="#993C1D">⟶ Lewes</text>
+      </g>
+
+      <!-- Seven Sisters -->
+      <g class="map-pin" data-hike="sevensisters" style="cursor: pointer;">
+        <circle cx="455" cy="405" r="9" fill="#D85A30"/>
+        <text x="455" y="409" text-anchor="middle" font-size="10" font-weight="500" fill="#FFFFFF">1</text>
+        <text x="455" y="430" text-anchor="middle" font-size="11" font-weight="500" fill="#4A1B0C">Seaford ⟶ Eastbourne</text>
+      </g>
+
+      <!-- Legend in top left -->
+      <g transform="translate(30, 30)">
+        <rect x="0" y="0" width="180" height="86" fill="#FFFFFF" stroke="#DDDBD3" stroke-width="0.5" rx="6"/>
+        <text x="12" y="20" font-size="10" font-weight="500" fill="#1A1A19">Hike type</text>
+        <circle cx="20" cy="40" r="5" fill="#D85A30"/>
+        <text x="32" y="44" font-size="10" fill="#5F5E5A">Coast / hills (south)</text>
+        <circle cx="20" cy="58" r="5" fill="#1D9E75"/>
+        <text x="32" y="62" font-size="10" fill="#5F5E5A">Woodland (north)</text>
+        <text x="12" y="80" font-size="9" fill="#888780" font-style="italic">⟲ loop · ⟶ A to B</text>
+      </g>
+
+    </svg>
+
+    <div class="map-legend">
+      <div class="legend-item"><span class="legend-dot" style="background: #534AB7;"></span>London (Hackney)</div>
+      <div class="legend-item"><span class="legend-dot" style="background: #D85A30;"></span>Coast & hills</div>
+      <div class="legend-item"><span class="legend-dot" style="background: #1D9E75;"></span>Woodland</div>
+      <div class="legend-item">Dashed lines = train route + London terminal</div>
+    </div>
+  </div>
+
+  <!-- HIKE CARDS -->
+  <h2>The shortlist</h2>
+  <p class="section-hint">Tap any card for full details, route info, and station-by-station travel.</p>
+
+  <div class="hikes-grid" id="hikes-grid"></div>
+
+  <footer>
+    Saved Tuesday 19 May 2026 · Weather forecast and travel info subject to change closer to the date
+  </footer>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+const hikes = {
+  sevensisters: {
+    number: '01',
+    eyebrow: 'The headliner',
+    title: 'Seven Sisters: Seaford → Eastbourne',
+    image: 'https://www.iaspaper.net/wp-content/uploads/2018/03/Seven-Sisters-Cliffs-Britain-1024x683.jpg',
+    pill: { label: 'Challenging', class: 'pill-challenging' },
+    distance: '13 mi',
+    elevation: '~500 m',
+    duration: '5–6 hr',
+    sat_temp: '22°C',
+    sat_rain: '45%',
+    type: 'A → B',
+    routeType: 'a-b',
+    intensity: 'High distance · moderate climbs',
+    summary: 'The cliffs walk. Around 13 miles along the white chalk cliffs of the South Downs, with rolling ascents and descents over each "sister". Technically easy paths but distance is the challenge — finishable in 4.5–7 hours depending on pace and stops.',
+    highlights: [
+      'Iconic chalk cliffs — Britain\'s most photographed coastline',
+      'Walk west-to-east so the cliffs stay in front of you',
+      'Cuckmere Haven viewpoint near the start — meandering river to sea',
+      'Beachy Head finish — England\'s tallest chalk cliff at 162m',
+      'Birling Gap café for a mid-walk break',
+    ],
+    journey: {
+      london_terminal: 'Victoria',
+      out: [
+        { from: 'Hackney Downs', via: 'Overground', to: 'Liverpool Street', time: '8 min' },
+        { from: 'Liverpool Street', via: 'Tube (Circle/District)', to: 'Victoria', time: '15 min' },
+        { from: 'London Victoria', via: 'Southern direct (or via Lewes)', to: 'Seaford', time: '1 hr 30' },
+      ],
+      back: [
+        { from: 'Eastbourne', via: 'Southern direct', to: 'London Victoria', time: '1 hr 27 (fastest)' },
+        { from: 'Victoria', via: 'Tube + Overground', to: 'Hackney Downs', time: '25 min' },
+      ],
+      total_one_way: '~2 hr door-to-platform',
+    },
+    weather_detail: {
+      high: '22°C',
+      low: '14°C',
+      rain_chance: '45%',
+      wind: 'Moderate coastal breeze',
+      note: 'Cliffs are exposed — wind feels stronger. Sun protection essential.',
+    },
+  },
+
+  boxhill: {
+    number: '02',
+    eyebrow: 'Closest serious climb',
+    title: 'Box Hill circular, Surrey',
+    image: 'https://www.nationaltrust.org.uk/binaries/content/gallery/website/visual-only-no-faces/places/box-hill/box-hill-views-c-national-trust-images-james-dobson.jpg',
+    pill: { label: 'Challenging', class: 'pill-challenging' },
+    distance: '8 mi',
+    elevation: '~400 m',
+    duration: '3–4 hr',
+    sat_temp: '28°C',
+    sat_rain: '45%',
+    type: 'Loop',
+    routeType: 'loop',
+    intensity: 'Steep climbs · solid quad/glute workout',
+    summary: 'The classic "challenging hike close to London". 8 miles through the National Trust estate with steep climbs, deep valleys, and plenty of steps. Mix of chalk grassland, woodland, the River Mole stepping stones, and panoramic Surrey views from the top.',
+    highlights: [
+      'The famous Box Hill viewpoint — sweeping Surrey views',
+      'Stepping stones across the River Mole (when water levels allow)',
+      'Steep zig-zag climbs that earn the view',
+      'Mole Valley and Mickleham woods',
+      'Smith & Western for burgers near the station post-walk',
+    ],
+    journey: {
+      london_terminal: 'Waterloo',
+      out: [
+        { from: 'Hackney Downs', via: 'Overground', to: 'Highbury & Islington', time: '6 min' },
+        { from: 'Highbury & Islington', via: 'Victoria line', to: 'Vauxhall', time: '12 min' },
+        { from: 'Vauxhall', via: 'South Western Railway', to: 'Box Hill & Westhumble', time: '~50 min' },
+      ],
+      back: [
+        { from: 'Box Hill & Westhumble', via: 'South Western Railway', to: 'London Waterloo', time: '~52 min' },
+        { from: 'Waterloo', via: 'Tube + Overground', to: 'Hackney Downs', time: '25 min' },
+      ],
+      total_one_way: '~1 hr 40 door-to-platform',
+    },
+    weather_detail: {
+      high: '28°C',
+      low: '15°C',
+      rain_chance: '45%',
+      wind: 'Light',
+      note: 'Warmest of the five locations. Climbs will feel hard in heat — start early.',
+    },
+  },
+
+  hassocks: {
+    number: '03',
+    eyebrow: 'Quiet ridge walk',
+    title: 'Hassocks → Lewes via Ditchling Beacon',
+    image: 'https://www.nationalparks.uk/wp-content/uploads/2024/06/South-Downs-Way-c-South-Downs-National-Park-Authority-1024x683.jpg',
+    pill: { label: 'Moderate+', class: 'pill-moderate' },
+    distance: '10 mi',
+    elevation: '~350 m',
+    duration: '4–5 hr',
+    sat_temp: '26°C',
+    sat_rain: '45%',
+    type: 'A → B',
+    routeType: 'a-b',
+    intensity: 'Steady ridge climb · long but gradual',
+    summary: 'Rolling chalk hills along the South Downs Way, passing Ditchling Beacon — the third-highest point on the South Downs at 248m. Big sweeping views with Lewes Castle visible on the horizon. Much quieter than Seven Sisters.',
+    highlights: [
+      'Ditchling Beacon — panoramic views across Sussex',
+      'Quiet ridgeline walking on the South Downs Way',
+      'Jack and Jill windmills near Clayton',
+      'Lewes is a great historic town for post-walk pints',
+      'Both ends have proper stations — no buses or taxis',
+    ],
+    journey: {
+      london_terminal: 'Victoria',
+      out: [
+        { from: 'Hackney Downs', via: 'Overground', to: 'Liverpool Street', time: '8 min' },
+        { from: 'Liverpool Street', via: 'Tube (Circle/District)', to: 'Victoria', time: '15 min' },
+        { from: 'London Victoria', via: 'Southern direct', to: 'Hassocks', time: '~50 min' },
+      ],
+      back: [
+        { from: 'Lewes', via: 'Southern direct', to: 'London Victoria', time: '~1 hr 10' },
+        { from: 'Victoria', via: 'Tube + Overground', to: 'Hackney Downs', time: '25 min' },
+      ],
+      total_one_way: '~1 hr 30 door-to-platform',
+    },
+    weather_detail: {
+      high: '26°C',
+      low: '13°C',
+      rain_chance: '45%',
+      wind: 'Moderate (exposed ridge)',
+      note: 'Ridgeline is exposed — windier than valleys. Layers help.',
+    },
+  },
+
+  tring: {
+    number: '04',
+    eyebrow: 'Easiest from Hackney · woodland',
+    title: 'Tring → Wendover (Ridgeway)',
+    image: 'https://www.chilternsaonb.org/wp-content/uploads/2021/05/Beech-woods-credit-Chilterns-Conservation-Board.jpg',
+    pill: { label: 'Moderate', class: 'pill-moderate' },
+    featured: true,
+    distance: '10 mi',
+    elevation: '~300 m',
+    duration: '4 hr',
+    sat_temp: '28°C',
+    sat_rain: '35%',
+    type: 'A → B',
+    routeType: 'a-b',
+    intensity: 'Rolling · woodland climbs · manageable',
+    summary: 'Britain\'s oldest path. Beech woodland, chalk escarpments, red kites overhead. The Ridgeway from Tring to Wendover follows the Chilterns escarpment with mixed woodland and open views. Extend to Princes Risborough for a full 18-mile day.',
+    highlights: [
+      'Walking on Britain\'s oldest road — 5,000 years old',
+      'Beech woodland canopies (genuinely lush in May)',
+      'Wendover Woods and Coombe Hill views',
+      'Red kites circling above the escarpment',
+      'Lowest Saturday rain chance of the five locations',
+      'Best train journey from Hackney — Euston is closer than Victoria',
+    ],
+    journey: {
+      london_terminal: 'Euston (out) · Marylebone (back)',
+      out: [
+        { from: 'Hackney Downs', via: 'Overground', to: 'Highbury & Islington', time: '6 min' },
+        { from: 'Highbury & Islington', via: 'Victoria line', to: 'Euston', time: '5 min' },
+        { from: 'London Euston', via: 'London Northwestern Railway', to: 'Tring', time: '~40 min' },
+      ],
+      back: [
+        { from: 'Wendover', via: 'Chiltern Railways', to: 'London Marylebone', time: '~50 min' },
+        { from: 'Marylebone', via: 'Tube (Bakerloo + Overground)', to: 'Hackney Downs', time: '~30 min' },
+      ],
+      total_one_way: '~1 hr 10 door-to-platform',
+    },
+    weather_detail: {
+      high: '28°C',
+      low: '12°C',
+      rain_chance: '35%',
+      wind: 'Light to moderate',
+      note: 'Driest forecast of the five. Beech canopy gives shade if it does get hot.',
+    },
+  },
+
+  dedham: {
+    number: '05',
+    eyebrow: 'Direct from Liverpool St',
+    title: 'Dedham Vale, Essex/Suffolk border',
+    image: 'https://www.nationaltrust.org.uk/binaries/content/gallery/website/visual-only-no-faces/places/flatford/flatford-mill-c-national-trust-images-justin-minns.jpg',
+    pill: { label: 'Easy–moderate', class: 'pill-easy' },
+    distance: '6–8 mi',
+    elevation: '~100 m',
+    duration: '3–4 hr',
+    sat_temp: '26°C',
+    sat_rain: '45%',
+    type: 'Loop',
+    routeType: 'loop',
+    intensity: 'Flat — distance is the only challenge',
+    summary: 'Constable country — rolling fields, ancient woodland, and the River Stour through the landscape John Constable painted. Relatively flat in elevation so the lightest workout of the five, but proper countryside and the easiest journey from Hackney.',
+    highlights: [
+      'Flatford Mill — Constable\'s "The Hay Wain" painted here',
+      'River Stour walks via Dedham village',
+      'Extend via Stoke-by-Nayland for a longer loop',
+      'Lots of National Trust tea rooms en route',
+      'Direct from Liverpool Street — easiest journey logistics',
+      'Paths can be muddy — boots over trainers',
+    ],
+    journey: {
+      london_terminal: 'Liverpool Street',
+      out: [
+        { from: 'London Fields', via: 'Overground', to: 'Liverpool Street', time: '8 min' },
+        { from: 'London Liverpool Street', via: 'Greater Anglia', to: 'Manningtree', time: '~55 min' },
+      ],
+      back: [
+        { from: 'Manningtree', via: 'Greater Anglia direct', to: 'London Liverpool Street', time: '~55 min' },
+        { from: 'Liverpool Street', via: 'Overground', to: 'London Fields', time: '8 min' },
+      ],
+      total_one_way: '~1 hr 10 door-to-platform',
+    },
+    weather_detail: {
+      high: '26°C',
+      low: '13°C',
+      rain_chance: '45%',
+      wind: 'Light',
+      note: 'Flat fields mean little shade — sun cream and a hat if it\'s clear.',
+    },
+  },
+};
+
+// Build cards
+const grid = document.getElementById('hikes-grid');
+const order = ['sevensisters', 'boxhill', 'hassocks', 'tring', 'dedham'];
+
+order.forEach(key => {
+  const h = hikes[key];
+  const featured = h.featured ? 'featured' : '';
+  const featuredBadge = h.featured ? '<span class="pill pill-featured">Easiest from Hackney</span>' : '';
+  const card = document.createElement('button');
+  card.className = `hike-card ${featured}`;
+  card.dataset.hike = key;
+  card.innerHTML = `
+    <div class="hike-image" style="background-image: url('${h.image}');"></div>
+    <div class="hike-content">
+      <div class="hike-number">${h.number} · ${h.eyebrow}</div>
+      <div class="hike-title">${h.title}</div>
+      <div class="hike-meta">
+        <span class="hike-meta-item">📏 ${h.distance}</span>
+        <span class="hike-meta-item">⛰ ${h.elevation}</span>
+        <span class="hike-meta-item">⏱ ${h.duration}</span>
+      </div>
+      <span class="pill ${h.pill.class}">${h.pill.label}</span>
+      ${featuredBadge}
+      <div class="tap-hint">👆 Tap for details, route & travel info</div>
+    </div>
+  `;
+  card.addEventListener('click', () => openModal(key));
+  grid.appendChild(card);
+});
+
+// Map pin clicks
+document.querySelectorAll('.map-pin').forEach(pin => {
+  pin.addEventListener('click', () => openModal(pin.dataset.hike));
+});
+
+// Modal
+const overlay = document.getElementById('modal-overlay');
+const modal = document.getElementById('modal');
+
+function openModal(key) {
+  const h = hikes[key];
+  const journeyOutHTML = h.journey.out.map(step => `
+    <div class="journey-row">
+      <div class="journey-station">${step.from}</div>
+      <div class="journey-arrow">→</div>
+      <div class="journey-detail">${step.via} → <strong>${step.to}</strong></div>
+      <div class="journey-time">${step.time}</div>
+    </div>
+  `).join('');
+  const journeyBackHTML = h.journey.back.map(step => `
+    <div class="journey-row">
+      <div class="journey-station">${step.from}</div>
+      <div class="journey-arrow">→</div>
+      <div class="journey-detail">${step.via} → <strong>${step.to}</strong></div>
+      <div class="journey-time">${step.time}</div>
+    </div>
+  `).join('');
+
+  const routeBadge = h.routeType === 'loop'
+    ? '<span style="background: #E1F5EE; color: #04342C; padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: 500;">⟲ Loop — same station back</span>'
+    : '<span style="background: #FAEEDA; color: #633806; padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: 500;">⟶ A to B — different stations</span>';
+
+  modal.innerHTML = `
+    <div class="modal-image" style="background-image: url('${h.image}');">
+      <button class="modal-close" id="close-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-eyebrow">${h.number} · ${h.eyebrow}</div>
+      <h2 class="modal-title">${h.title}</h2>
+      <div style="margin-bottom: 14px;">
+        <span class="pill ${h.pill.class}">${h.pill.label}</span>
+        ${routeBadge}
+      </div>
+      <p class="modal-summary">${h.summary}</p>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">Distance</div><div class="stat-value">${h.distance}</div></div>
+        <div class="stat-card"><div class="stat-label">Elevation</div><div class="stat-value">${h.elevation}</div></div>
+        <div class="stat-card"><div class="stat-label">On foot</div><div class="stat-value">${h.duration}</div></div>
+        <div class="stat-card"><div class="stat-label">Intensity</div><div class="stat-value" style="font-size: 12px;">${h.intensity}</div></div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Highlights</h3>
+        <ul>${h.highlights.map(x => `<li>${x}</li>`).join('')}</ul>
+      </div>
+
+      <div class="modal-section">
+        <h3>Travel from Hackney (London terminal: ${h.journey.london_terminal})</h3>
+        <div style="font-size: 12px; color: #6B6A66; margin-bottom: 8px;">Total: <strong style="color: #1A1A19;">${h.journey.total_one_way}</strong></div>
+        <div style="font-size: 12px; font-weight: 500; color: #6B6A66; margin-bottom: 6px; margin-top: 10px;">→ OUTBOUND</div>
+        <div class="journey-box">${journeyOutHTML}</div>
+        <div style="font-size: 12px; font-weight: 500; color: #6B6A66; margin-bottom: 6px; margin-top: 12px;">← RETURN</div>
+        <div class="journey-box">${journeyBackHTML}</div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Saturday 23 May — weather detail</h3>
+        <div class="weather-detail">
+          <div class="weather-detail-row"><span class="weather-detail-label">High</span><span class="weather-detail-value">${h.weather_detail.high}</span></div>
+          <div class="weather-detail-row"><span class="weather-detail-label">Low</span><span class="weather-detail-value">${h.weather_detail.low}</span></div>
+          <div class="weather-detail-row"><span class="weather-detail-label">Rain chance</span><span class="weather-detail-value">${h.weather_detail.rain_chance}</span></div>
+          <div class="weather-detail-row"><span class="weather-detail-label">Wind</span><span class="weather-detail-value">${h.weather_detail.wind}</span></div>
+          <div style="font-size: 12px; color: #6B6A66; margin-top: 10px; padding-top: 10px; border-top: 0.5px solid #EAE8E0; line-height: 1.6;">
+            <strong style="color: #1A1A19;">Note:</strong> ${h.weather_detail.note}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('close-btn').addEventListener('click', closeModal);
+}
+
+function closeModal() {
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) closeModal();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
+});
+</script>
+
+</body>
+</html>
